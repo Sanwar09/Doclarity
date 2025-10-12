@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Simplify complex legal documents with AI. Get clear summaries, understand complex clauses, and make informed decisions with our legal document analyzer." />
+    <meta name="keywords" content="legal documents, AI analysis, contract review, legal advice, document simplification" />
+    <meta name="author" content="Legal Doc Demystifier" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://legaldocdemystifier.com/" />
+    <meta property="og:title" content="Legal Document Demystifier - Understand Legal Documents with AI" />
+    <meta property="og:description" content="Transform complex legal jargon into clear, actionable insights. Upload your documents and get instant AI-powered analysis." />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://legaldocdemystifier.com/" />
+    <meta property="twitter:title" content="Legal Document Demystifier" />
+    <meta property="twitter:description" content="Transform complex legal jargon into clear, actionable insights." />
+    <meta property="twitter:image" content="/twitter-image.png" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Title -->
+    <title>Legal Document Demystifier - AI-Powered Legal Document Analysis</title>
+    
+    <!-- Favicon variations -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+	<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- No Script CSS -->
+    <noscript>
+      <style>
+        .no-js-message {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          font-family: 'Inter', sans-serif;
+          text-align: center;
+          padding: 20px;
+          background-color: #f9fafb;
+        }
+        .no-js-content {
+          max-width: 600px;
+        }
+        .no-js-content h1 {
+          font-size: 24px;
+          margin-bottom: 16px;
+          color: #111827;
+        }
+        .no-js-content p {
+          color: #6b7280;
+          line-height: 1.6;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    ">
+      <div style="text-align: center;">
+        <div style="
+          width: 50px;
+          height: 50px;
+          border: 3px solid #f3f4f6;
+          border-top-color: #2563eb;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 20px;
+        "></div>
+        <p style="
+          font-family: 'Inter', sans-serif;
+          color: #6b7280;
+          font-size: 14px;
+        ">Loading Legal Document Demystifier...</p>
+      </div>
+    </div>
+    
+    <style>
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- No JavaScript Message -->
+    <noscript>
+      <div class="no-js-message">
+        <div class="no-js-content">
+          <h1>JavaScript Required</h1>
+          <p>
+            Legal Document Demystifier requires JavaScript to function properly. 
+            Please enable JavaScript in your browser settings to use this application.
+          </p>
+        </div>
+      </div>
+    </noscript>
+    
+    <!-- React Root -->
+    <div id="root"></div>
+    
+    <!-- Module Script -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Remove loading screen when app loads -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(function() {
+              loadingScreen.style.display = 'none';
+            }, 300);
+          }
+        }, 100);
+      });
+    </script>
+    
+  </body>
+</html>

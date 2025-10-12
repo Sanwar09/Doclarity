@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doclarity - Legal Document Simplifier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            background-color: #2e2e4a;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .drag-area {
+            border: 2px dashed #6a8d9a;
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        .drag-area.drag-active {
+            background-color: rgba(106, 141, 154, 0.2);
+            border-color: #55a6d3;
+        }
+
+        .cta-btn {
+            background-color: #55a6d3;
+            color: #fff;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            background-color: #4a91c0;
+        }
+
+        .cta-btn:disabled {
+            background-color: #4a4a6e;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #55a6d3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Flexbox for equal height and width sections */
+        .results-section {
+            display: flex;
+            gap: 2rem;
+            align-items: stretch; /* Ensures children stretch to the same height */
+			flex-direction: column;
+        }
+
+        .results-section > div {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Makes both containers equal width */
+        }
+
+        .results-section h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .document-content {
+            background-color: #1a1a2e;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            flex-grow: 1; /* Makes the content section fill the height */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            border: 1px solid #4a4a6e;
+            min-height: 400px; /* Added to enforce a minimum consistent height */
+        }
+
+        @media (max-width: 768px) {
+            .results-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white">
+
+    <div class="container mx-auto p-8 md:p-12 rounded-2xl shadow-lg">
+        <h1 class="text-4xl font-bold text-center mb-6 text-[#55a6d3]">Doclarity - Legal Document Simplifier</h1>
+        <p class="text-center text-slate-400 mb-8">Upload a legal document to get a simplified summary in a flash!</p>
+
+        <div id="drag-area" class="drag-area border-2 border-dashed border-gray-600 rounded-xl p-12 mb-8">
+            <p class="text-slate-400 text-lg mb-4">Drag & Drop your file here</p>
+            <p class="text-slate-500 text-sm">or</p>
+            <input type="file" id="file-input" class="hidden">
+            <button onclick="document.getElementById('file-input').click()" class="mt-4 px-6 py-3 bg-[#55a6d3] text-white rounded-lg font-semibold hover:bg-[#4a91c0] transition-colors">Browse Files</button>
+            <p id="file-name" class="mt-4 text-slate-400 text-sm"></p>
+        </div>
+        
+        <div class="flex justify-center mb-8">
+            <button id="simplify-btn" class="cta-btn px-8 py-3 rounded-lg font-bold transition-all transform hover:scale-105" disabled>Simplify Document</button>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <div class="results-section">
+                <div>
+                    <h3 class="text-2xl font-semibold text-[#88b0c8]">Original Document</h3>
+                    <div id="original-document" class="document-content mt-4"></div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-[#88b0c8]">Simplified Summary</h3>
+                    <div id="simplified-document" class="document-content mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // A mock legal document to simulate the file upload content.
+        // In a real-world scenario, you would read the content of the uploaded file.
+        const mockLegalDocument = `
+MEMORANDUM OF UNDERSTANDING
+
+THIS MEMORANDUM OF UNDERSTANDING ("MOU") is made and entered into as of this 24th day of August, 2025,
+by and between Party A, a corporation organized and existing under the laws of the State of Delaware, with its principal place of business at 123 Main Street, Anytown, DE 12345 ("Party A"), and Party B, a corporation organized and existing under the laws of the State of New York, with its principal place of business at 678 Market Street, Othertown, NY 67890 ("Party B").
+
+1. PURPOSE
+The purpose of this MOU is to set forth the general terms and conditions for a collaborative partnership between Party A and Party B, hereinafter referred to as the "Parties," with the objective of exploring and developing a joint venture to address the market for renewable energy solutions.
+
+2. SCOPE OF WORK
+2.1 Party A shall be responsible for providing technical expertise and resources related to solar panel technology.
+2.2 Party B shall be responsible for providing marketing, distribution, and logistical support.
+2.3 The Parties will establish a Joint Steering Committee to oversee the project's progress and make decisions.
+
+3. CONFIDENTIALITY
+The Parties agree to keep all information, documents, and data disclosed by one Party to the other in connection with this MOU strictly confidential. This obligation shall survive the termination of this MOU for a period of five (5) years.
+
+4. TERM
+This MOU shall commence on the date first written above and shall continue in full force and effect for a period of twelve (12) months, unless earlier terminated by mutual written agreement of the Parties.
+
+5. NON-BINDING
+This MOU is intended to serve as an outline of the Parties' intentions and does not create any legally binding obligations on either Party. A definitive, legally binding agreement shall be executed at a later date if the Parties decide to proceed with the joint venture.
+
+IN WITNESS WHEREOF, the Parties have executed this MOU as of the date first above written.
+        `;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('file-input');
+            const dragArea = document.getElementById('drag-area');
+            const fileNameDisplay = document.getElementById('file-name');
+            const simplifyBtn = document.getElementById('simplify-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const originalDocDisplay = document.getElementById('original-document');
+            const simplifiedDocDisplay = document.getElementById('simplified-document');
+            
+            // API Key for Gemini API (provided by the Canvas environment)
+            const apiKey = "AIzaSyC78rsDnpurrrb4aGoP8W9mdxcH_9ypuoc"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            let selectedFile = null;
+
+            // --- File Input and Drag-and-Drop Handling ---
+            fileInput.addEventListener('change', (event) => {
+                selectedFile = event.target.files[0];
+                if (selectedFile) {
+                    fileNameDisplay.textContent = `Selected file: ${selectedFile.name}`;
+                    simplifyBtn.disabled = false;
+                } else {
+                    fileNameDisplay.textContent = '';
+                    simplifyBtn.disabled = true;
+                }
+            });
+
+            dragArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                dragArea.classList.add('drag-active');
+            });
+
+            dragArea.addEventListener('dragleave', () => {
+                dragArea.classList.remove('drag-active');
+            });
+
+            dragArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                dragArea.classList.remove('drag-active');
+                selectedFile = event.dataTransfer.files[0];
+                if (selectedFile) {
+                    fileInput.files = event.dataTransfer.files;
+                    fileNameDisplay.textContent = `Selected file: ${selectedFile.name}`;
+                    simplifyBtn.disabled = false;
+                }
+            });
+
+            // --- AI Functionality for Simplification ---
+            simplifyBtn.addEventListener('click', async () => {
+                if (!selectedFile) {
+                    simplifiedDocDisplay.innerHTML = `<p class="error-message">Please select a file first.</p>`;
+                    return;
+                }
+
+                originalDocDisplay.innerHTML = `<pre>${mockLegalDocument}</pre>`;
+                resultsContainer.classList.remove('hidden');
+
+                simplifiedDocDisplay.innerHTML = '<div class="loading-spinner"></div><p class="text-center">Simplifying your document with AI...</p>';
+
+                const documentContent = mockLegalDocument;
+
+                try {
+                    // Check if the API key is present. If not, simulate the response.
+                    if (!apiKey) {
+                        const simulatedResponse = `
+- **Purpose:** This agreement is to explore a partnership between two parties to create a new business for renewable energy.
+- **Roles:** Party A will provide the solar panel technology and expertise, while Party B will handle marketing and distribution.
+- **Confidentiality:** Both parties agree to keep any shared information secret for five years, even if the agreement ends.
+- **Duration:** The agreement lasts for 12 months unless both parties agree in writing to end it sooner.
+- **Legal Status:** This is NOT a legally binding contract. It only outlines intentions. A separate, formal agreement will be created later if the parties decide to move forward.
+                        `;
+
+                        // Simulate the API call delay
+                        setTimeout(() => {
+                            simplifiedDocDisplay.innerHTML = simulatedResponse;
+                        }, 2000); // 2-second delay for effect
+                        return;
+                    }
+
+                    const prompt = `You are a helpful assistant that simplifies legal documents. Take the following legal text and provide a concise, easy-to-understand summary. Use simple language and avoid jargon. The summary should be presented as a bulleted list of key takeaways.
+
+Legal Document:
+${documentContent}`;
+                    
+                    const payload = {
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        const errorMessage = errorData.error?.message || `API call failed with status: ${response.status}`;
+                        throw new Error(errorMessage);
+                    }
+
+                    const result = await response.json();
+                    
+                    const simplifiedText = result.candidates[0].content.parts[0].text;
+
+                    simplifiedDocDisplay.innerHTML = simplifiedText;
+
+                } catch (error) {
+                    console.error('Error simplifying document:', error);
+                    simplifiedDocDisplay.innerHTML = `<p class="error-message">Failed to simplify the document. Please try again. Error: ${error.message}</p>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+tenet.txt
+oauth_cred.json
+
+deploy.yml
+deploy*.yml
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+.history/
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.phpunit.result.cache
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+tmp/
+temp/
+
+# Upload directories
+uploads/
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+data/
+
+# Production files
+*.min.js
+*.min.css
+*.map
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.cer
+
+# Python (if using any Python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# PM2
+.pm2/
+pm2.log
+
+# Misc
+.sass-cache/
+.connect.lock
+.lock-wscript
+.node_repl_history
+.yarn-integrity
+.cache
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Analysis outputs (if saved locally)
+analysis-results/
+reports/
+*.pdf
+
+# Backup files
+backup/
+backups/
+*.backup
+
+# Private keys and credentials
+*.key
+*.pem
+credentials.json
+service-account.json
+firebase-admin-sdk.json
+
+# Local development
+.local/
+local-data/
+
+# Monitoring
+.monitor/
+monitoring/
+
+# Documentation build
+docs/_build/
+docs/.vuepress/dist/
+
+# Serverless
+.serverless/
+.vercel/
+.netlify/
+
+# Bundle analysis
+stats.json
+report.html
+
+# Error screenshots
+error-shots/
+
+# Optional - Uncomment if you want to ignore package-lock
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

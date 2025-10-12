@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Legal Simplifier</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">⚖️ Doclarity</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Simplify Complex Legal Documents with AI</h1>
+            <p>Upload a document and get a clear, concise summary in seconds. No more jargon!</p>
+        </section>
+
+        <section class="upload-section">
+            <div class="card">
+                <h2>Upload Your Document</h2>
+                <div class="drag-and-drop" id="drag-area">
+                    <p>Drag & Drop a PDF or Word file here</p>
+                    <p>- OR -</p>
+                    <input type="file" id="file-input" accept=".pdf,.doc,.docx">
+                    <label for="file-input" class="button">Choose File</label>
+                </div>
+                <div id="file-name" class="file-name"></div>
+                <button id="simplify-btn" class="button primary" disabled>Simplify Document</button>
+            </div>
+        </section>
+        
+        <div class="results-container hidden" id="results-container">
+            <div class="results-card">
+                <h2>Original Document</h2>
+                <div class="document-display" id="original-document">
+                    <p>Your original document will appear here after upload.</p>
+                </div>
+            </div>
+            <div class="results-card">
+                <h2>Simplified Summary</h2>
+                <div class="document-display" id="simplified-document">
+                    <p>The AI-generated summary will be displayed here.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI Legal Simplifier. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

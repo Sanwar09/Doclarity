@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Uploads - keep directory but ignore contents
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Database
+*.sqlite
+*.db
+
+# Temp files
+temp/
+tmp/
+*.tmp
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# SSL
+*.pem
+*.key
+
+# Google Cloud credentials
+credentials.json
+service-account*.json
