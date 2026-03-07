@@ -1,18 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   confidenceFromChunks,
   formatRagReferences,
   getRagDocument,
   retrieveTopChunks
 } from '../services/ragStore.js';
+import { generateStructuredAnswer } from '../services/llm.js';
 
 dotenv.config();
 
 const router = express.Router();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const MODEL_ID = process.env.GEMINI_MODEL_ID || 'gemini-2.5-flash';
 
 const RISK_KEYWORDS = [
@@ -51,14 +49,8 @@ const generationConfig = {
         }
       },
       confidence: { type: 'string', enum: ['low', 'medium', 'high'] },
-      suggestedQuestions: {
-        type: 'array',
-        items: { type: 'string' }
-      },
-      nextActions: {
-        type: 'array',
-        items: { type: 'string' }
-      }
+      suggestedQuestions: { type: 'array', items: { type: 'string' } },
+      nextActions: { type: 'array', items: { type: 'string' } }
     },
     required: ['answer']
   }
@@ -71,9 +63,6 @@ router.post('/', async (req, res) => {
     if (!message) {
       return res.status(400).json({ message: 'Missing message' });
     }
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ message: 'GEMINI_API_KEY not set' });
-    }
 
     const resolvedRagDocId = ragDocId || documentContext?.ragDocId;
     const ragDoc = getRagDocument(resolvedRagDocId);
@@ -82,36 +71,21 @@ router.post('/', async (req, res) => {
     const systemInstruction = buildSystemInstruction(documentContext, ragDoc?.documentName);
     const history = toGeminiHistory(conversationHistory);
 
-    const model = genAI.getGenerativeModel({
-      model: MODEL_ID,
-      systemInstruction
-    });
-
-    const chat = model.startChat({
-      history,
-      generationConfig
-    });
-
     const fallback = buildNarrowContext(message, documentContext);
     const contextPacket = topChunks.length
       ? buildRagContextPacket(topChunks)
       : buildFallbackPacket(fallback);
 
-    const result = await chat.sendMessage([
-      {
-        text: [
-          'Use ONLY the provided context snippets.',
-          'If context is insufficient, clearly say what is missing.',
-          contextPacket
-        ].join('\n\n')
-      },
-      { text: `Question: ${message}\nAnswer in plain English with short bullets when helpful.` }
-    ]);
+    const text = await generateStructuredAnswer({
+      systemInstruction,
+      history,
+      contextPacket,
+      message,
+      generationConfig,
+      modelId: MODEL_ID
+    });
 
-    const response = await result.response;
-    const text = response.text();
-
-    let parsed = null;
+    let parsed;
     try {
       parsed = JSON.parse(text);
     } catch {
@@ -125,26 +99,18 @@ router.post('/', async (req, res) => {
     }
 
     const ragRefs = formatRagReferences(topChunks);
-    const references = Array.isArray(parsed.references) && parsed.references.length
-      ? parsed.references
-      : ragRefs;
-
     const payload = {
       answer: parsed.answer || text,
-      references,
+      references: Array.isArray(parsed.references) && parsed.references.length ? parsed.references : ragRefs,
       confidence: parsed.confidence || confidenceFromChunks(topChunks),
-      suggestedQuestions: Array.isArray(parsed.suggestedQuestions)
-        ? parsed.suggestedQuestions
-        : defaultSuggestions(),
-      nextActions: Array.isArray(parsed.nextActions)
-        ? parsed.nextActions.slice(0, 3)
-        : defaultNextActions()
+      suggestedQuestions: Array.isArray(parsed.suggestedQuestions) ? parsed.suggestedQuestions : defaultSuggestions(),
+      nextActions: Array.isArray(parsed.nextActions) ? parsed.nextActions.slice(0, 3) : defaultNextActions()
     };
 
     return res.json(payload);
   } catch (err) {
     console.error('Chat error:', err?.response || err);
-    return res.status(500).json({ message: 'Failed to get response from Gemini.' });
+    return res.status(500).json({ message: 'Failed to generate grounded response.' });
   }
 });
 
@@ -204,7 +170,6 @@ function buildRagContextPacket(chunks) {
     title: c.title,
     text: (c.text || '').slice(0, 900)
   }));
-
   return ['Retrieved Context:', JSON.stringify(compact)].join('\n');
 }
 
@@ -218,9 +183,7 @@ function normalize(str = '') {
 
 function relevanceScore(q, clause) {
   const qn = normalize(q);
-  const text = normalize(
-    [clause.title, clause.section, clause.originalText, clause.explanation].join(' ')
-  );
+  const text = normalize([clause.title, clause.section, clause.originalText, clause.explanation].join(' '));
 
   const qTerms = qn.split(/\s+/).filter((t) => t.length > 2);
   let score = 0;

@@ -10,6 +10,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { extractTextFromBuffer } from '../services/documentParser.js';
 import { extractTextFromImage } from '../services/ocr.js';
 import { createRagDocument } from '../services/ragStore.js';
+import { analyzeDocumentLocally } from '../services/localAnalyze.js';
 import { safetySettings } from '../services/gemini.js';
 // import your existing analyzeDocumentWithGemini function
 // import { analyzeDocumentWithGemini } from '...';
@@ -19,9 +20,9 @@ dotenv.config();
 const DEBUG = process.env.ANALYZE_DEBUG === 'true';
 
 const router = express.Router();
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const MODEL_ID_SUMMARY = process.env.GEMINI_MODEL_ID || 'gemini-2.0-flash';   // quality
-const MODEL_ID_CHUNK = process.env.GEMINI_CHUNK_MODEL_ID || 'gemini-2.0-flash'; // speed
+const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+const MODEL_ID_SUMMARY = process.env.GEMINI_MODEL_ID || 'gemini-2.5-flash';   // quality
+const MODEL_ID_CHUNK = process.env.GEMINI_CHUNK_MODEL_ID || 'gemini-2.5-flash'; // speed
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -151,7 +152,7 @@ router.post('/', async (req, res) => {
 		}
 
 		// Run analysis (auto map-reduce for very large docs)
-		const analysis = await analyzeDocumentWithGemini(text, docType);
+		const analysis = await analyzeDocument(text, docType);
 
 		const rag = createRagDocument({
 			rawText: text,
@@ -187,7 +188,7 @@ router.post('/text', async (req, res) => {
     if (clean.length < 30) {
       return res.status(400).json({ message: 'Please provide at least ~30 characters of text.' });
     }
-    const analysis = await analyzeDocumentWithGemini(clean, docType);
+    const analysis = await analyzeDocument(clean, docType);
     const rag = createRagDocument({
       rawText: clean,
       analysis,
@@ -220,7 +221,7 @@ router.post('/image', uploadImage.single('image'), async (req, res) => {
     }
 
     // Your existing analysis pipeline
-    const analysis = await analyzeDocumentWithGemini(text, req.body?.docType);
+    const analysis = await analyzeDocument(text, req.body?.docType);
     const rag = createRagDocument({
       rawText: text,
       analysis,
@@ -259,7 +260,16 @@ function chunkText(text, maxChars = 45000) {
 	return chunks;
 }
 
+async function analyzeDocument(text, docType) {
+	const engine = (process.env.ANALYZE_ENGINE || 'gemini').toLowerCase();
+	if (engine === 'local' || !process.env.GEMINI_API_KEY) {
+		return analyzeDocumentLocally(text, docType);
+	}
+	return analyzeDocumentWithGemini(text, docType);
+}
+
 async function analyzeDocumentWithGemini(text, docType) {
+	if (!genAI) throw new Error('Gemini is not configured. Set GEMINI_API_KEY or use ANALYZE_ENGINE=local.');
 	// If text is small enough, single-pass; else map-reduce
 	const focused = selectTopParagraphs(text, 60000, 120); // ~15–20k tokens
 	const SINGLE_PASS_LIMIT = 70000; // chars
@@ -834,4 +844,8 @@ function normalizeFinal(out, docType) {
 
 	return normalized;
 }
+
+
+
+
 
