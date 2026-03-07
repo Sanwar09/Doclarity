@@ -40,6 +40,7 @@ const Upload = () => {
       const analyzeRes = await axios.post('/api/analyze', {
         docId,
         docType: docType === 'auto' ? undefined : docType,
+        documentName: originalName || file.name,
       });
 
       const analysisData = {

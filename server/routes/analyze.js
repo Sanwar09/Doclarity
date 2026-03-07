@@ -9,6 +9,7 @@ import multer from 'multer';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { extractTextFromBuffer } from '../services/documentParser.js';
 import { extractTextFromImage } from '../services/ocr.js';
+import { createRagDocument } from '../services/ragStore.js';
 import { safetySettings } from '../services/gemini.js';
 // import your existing analyzeDocumentWithGemini function
 // import { analyzeDocumentWithGemini } from '...';
@@ -152,10 +153,14 @@ router.post('/', async (req, res) => {
 		// Run analysis (auto map-reduce for very large docs)
 		const analysis = await analyzeDocumentWithGemini(text, docType);
 
-		// Optional: persist analysis by docId (in-memory or DB)
-		// analysisStore.set(docId, analysis)
+		const rag = createRagDocument({
+			rawText: text,
+			analysis,
+			documentName: req.body?.documentName || docId,
+			sourceDocId: docId
+		});
 
-		res.json(analysis);
+		res.json({ ...analysis, ...rag });
 	} catch (e) {
 		console.error('Analyze error:', e);
 		res.status(500).json({ message: 'Analysis failed' });
@@ -183,7 +188,13 @@ router.post('/text', async (req, res) => {
       return res.status(400).json({ message: 'Please provide at least ~30 characters of text.' });
     }
     const analysis = await analyzeDocumentWithGemini(clean, docType);
-    return res.json(analysis);
+    const rag = createRagDocument({
+      rawText: clean,
+      analysis,
+      documentName: 'Quick Analysis (Text)',
+      sourceDocId: null
+    });
+    return res.json({ ...analysis, ...rag });
   } catch (e) {
     console.error('Analyze text error:', e);
     res.status(500).json({ message: 'Analysis failed' });
@@ -210,7 +221,13 @@ router.post('/image', uploadImage.single('image'), async (req, res) => {
 
     // Your existing analysis pipeline
     const analysis = await analyzeDocumentWithGemini(text, req.body?.docType);
-    return res.json(analysis);
+    const rag = createRagDocument({
+      rawText: text,
+      analysis,
+      documentName: 'Quick Analysis (Image)',
+      sourceDocId: null
+    });
+    return res.json({ ...analysis, ...rag });
   } catch (err) {
     console.error('[ANALYZE:image] error:', err);
     return res.status(500).json({
@@ -817,3 +834,4 @@ function normalizeFinal(out, docType) {
 
 	return normalized;
 }
+

@@ -15,7 +15,7 @@ import {
 
 const importanceOrder = { high: 0, medium: 1, low: 2 };
 
-const ClauseExplorer = ({ clauses = [], onAskClause }) => {
+const ClauseExplorer = ({ clauses = [], onAskClause, selectedClauseId = null }) => {
   const [expandedClauses, setExpandedClauses] = useState({});
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,6 +28,11 @@ const ClauseExplorer = ({ clauses = [], onAskClause }) => {
     } catch { return {}; }
   });
   const [showPinnedOnly, setShowPinnedOnly] = useState(false);
+  useEffect(() => {
+    if (!selectedClauseId) return;
+    setExpandedClauses((prev) => ({ ...prev, [selectedClauseId]: true }));
+  }, [selectedClauseId]);
+
   const searchRef = useRef(null);
 
   // Debounce search
