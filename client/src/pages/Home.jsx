@@ -1,396 +1,371 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Shield,
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Search,
+  MessageSquare,
   UploadCloud,
-  CheckCircle,
+  FileText,
+  Clock3,
+  Building2,
+  Briefcase,
+  Users,
+  CheckCircle2,
   Lock,
+  Zap
 } from 'lucide-react';
-import { Sparkles, Search, MessageSquare, Upload, FileText, Clock, ArrowRight } from 'lucide-react';
 import QuickAnalyze from '../components/QuickAnalyze';
-import FAQ from "../components/FAQ";
+import FAQ from '../components/FAQ';
 
 const features = [
   {
     title: 'At a Glance Summary',
-    description:
-      'Get a plain-language overview with key risks, important dates, and money terms so you can decide faster.',
+    description: 'See risks, deadlines, costs, and obligations in one simple dashboard.',
     icon: Sparkles,
-    bullets: [
-      'Overall risk level',
-      'Important dates & deadlines',
-      'Fees, penalties, and amounts',
-    ],
+    bullets: ['Risk score and level', 'Important dates and timelines', 'Money terms and penalties']
   },
   {
-    title: 'Interactive Clause Explorer',
-    description:
-      'Drill into clauses, see plain-English explanations, and understand implications.',
+    title: 'Clause Explorer',
+    description: 'Open any clause and understand what it means in plain language.',
     icon: Search,
-    bullets: ['Search & filter clauses', 'Plain-English explanations', 'Actionable suggestions'],
+    bullets: ['Clause-level explanations', 'Priority markers', 'Actionable next steps']
   },
   {
-    title: 'AI-Powered Q&A Chat',
-    description:
-      'Ask natural questions about the document and get answers with clause references.',
+    title: 'AI Legal Chat',
+    description: 'Ask follow-up questions and get context-grounded answers fast.',
     icon: MessageSquare,
-    bullets: ['Context-aware answers', 'Clause citations', 'Follow-up suggestions'],
+    bullets: ['Grounded responses', 'Negotiation-focused prompts', 'Multi-language support']
+  }
+];
+
+const useCases = [
+  {
+    title: 'Tenants and Landlords',
+    description: 'Understand rent terms, deposits, lock-in, notice periods, and penalties before signing.',
+    icon: Building2
   },
+  {
+    title: 'Freelancers and Consultants',
+    description: 'Review payment terms, ownership rights, confidentiality, and liability exposure quickly.',
+    icon: Briefcase
+  },
+  {
+    title: 'Small Teams and Startups',
+    description: 'Save legal review time by identifying top risk clauses and negotiation points early.',
+    icon: Users
+  }
 ];
 
 const steps = [
   {
-    title: 'Upload your document',
-    description: 'PDF or DOCX. We extract text and keep your data private.',
-    icon: UploadCloud,
+    title: 'Upload document',
+    description: 'Upload PDF or DOCX securely.',
+    icon: UploadCloud
   },
   {
-    title: 'AI analyzes it',
-    description:
-      'Identifies key terms, risky clauses, financials, and deadlines.',
-    icon: FileText,
+    title: 'AI analyzes clauses',
+    description: 'Extracts key obligations, risks, dates, and money terms.',
+    icon: FileText
   },
   {
-    title: 'Understand in minutes',
-    description:
-      'Read the summary, explore clauses, and chat with the AI for clarity.',
-    icon: Clock,
-  },
+    title: 'Decide with clarity',
+    description: 'Use the dashboard and chat to understand what to do next.',
+    icon: Clock3
+  }
 ];
 
 const Home = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const reveal = (delay = 0) => ({
+    animation: `fadeUp 700ms ease ${delay}ms both`
+  });
+
   return (
     <div className="bg-slate-50">
-      {/* Hero */}
-      {/* <section className="relative overflow-hidden">
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+      <section className="relative overflow-hidden border-b border-slate-200 bg-white">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-200/40 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-accent-200/40 blur-3xl" />
+          <div className="absolute -top-24 right-0 h-80 w-80 rounded-full bg-blue-100/70 blur-3xl" />
+          <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-emerald-100/70 blur-3xl" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
-          <div className="flex flex-col-reverse lg:flex-row items-center gap-10">
-            <div className="w-full lg:w-7/12">
-              <div className="inline-flex items-center gap-2 bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-medium mb-4">
-                <Shield className="w-4 h-4" />
-                Private, safe, and supportive
+        <div className="relative max-w-7xl mx-auto px-6 pt-16 pb-14" style={reveal(0)}>
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div style={reveal(80)}>
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700 mb-6">
+                <ShieldCheck className="w-4 h-4" />
+                Legal clarity in plain language
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
-                Demystify legal documents with AI
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+                Understand legal documents
+                <span className="block text-blue-700">before you sign</span>
               </h1>
 
-              <p className="mt-4 text-slate-600 text-base sm:text-lg">
-                Upload contracts, leases, or terms of service and get a clear summary,
-                explore clauses interactively, and ask questions in plain English.
+              <p className="mt-5 text-lg text-slate-600 max-w-2xl">
+                Doclarity turns complex contracts into clear risks, obligations, deadlines, and negotiation points so users can act with confidence.
               </p>
 
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   to="/upload"
-                  className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-white font-medium hover:bg-primary-700 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-700 transition-colors"
                 >
-                  <UploadCloud className="w-5 h-5 mr-2" />
-                  Upload a document
+                  Start Analysis
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a
-                  href="#features"
-                  className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-slate-800 font-medium border border-gray-300 hover:bg-slate-50 transition-colors"
+                <Link
+                  to="/compare"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white border border-slate-300 px-6 py-3 text-slate-800 font-semibold hover:bg-slate-100 transition-colors"
                 >
-                  See features
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
+                  Compare Documents
+                </Link>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm text-slate-600">
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-success-600 mr-2" />
-                  No setup required
+              <div className="mt-7 grid sm:grid-cols-3 gap-3 text-sm">
+                <div className="flex items-center gap-2 text-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Fast clause insights
                 </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-success-600 mr-2" />
-                  Clear, plain English
+                <div className="flex items-center gap-2 text-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Better negotiation prep
                 </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-success-600 mr-2" />
-                  Free to try
+                <div className="flex items-center gap-2 text-slate-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Secure document handling
                 </div>
               </div>
             </div>
 
-            <div className="w-full lg:w-5/12">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-5">
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary-100 p-2 rounded-lg">
-                    <Sparkles className="w-5 h-5 text-primary-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900">At a Glance Summary</h3>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Get key risks, obligations, dates, and costs in one place.
-                    </p>
-                  </div>
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-xl p-6" style={reveal(160)}>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Why users like Doclarity</h3>
+              <div className="space-y-3 text-sm">
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="font-semibold text-slate-800">Clear risk summary</p>
+                  <p className="text-slate-600 mt-1">See what can go wrong and what to review first.</p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-success-50 rounded-lg p-3">
-                    <p className="font-medium text-success-700 mb-1">Benefits</p>
-                    <ul className="text-success-700 space-y-1">
-                      <li>• Favorable terms identified</li>
-                      <li>• Negotiation points</li>
-                    </ul>
-                  </div>
-                  <div className="bg-danger-50 rounded-lg p-3">
-                    <p className="font-medium text-danger-700 mb-1">Risks</p>
-                    <ul className="text-danger-800 space-y-1">
-                      <li>• Penalties and fees</li>
-                      <li>• Termination traps</li>
-                    </ul>
-                  </div>
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="font-semibold text-slate-800">Actionable next steps</p>
+                  <p className="text-slate-600 mt-1">Get practical guidance on negotiation and due dates.</p>
                 </div>
-                <div className="mt-4 text-xs text-slate-500">
-                  Not legal advice. For informational purposes only.
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="font-semibold text-slate-800">Chat for follow-ups</p>
+                  <p className="text-slate-600 mt-1">Ask document-specific questions instantly.</p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section> */}
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 pt-20 pb-32">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-full px-5 py-2 mb-8 hover:bg-indigo-100 transition-colors">
-            <span className="bg-indigo-600 text-white text-sm font-semibold px-3 py-1 rounded-full">AI-Powered</span>
-            <span className="text-gray-700 text-sm font-medium">Legal Document Simplification</span>
-          </div>
-          
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gray-900">Simplify </span>
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">Complex Legal</span>
-            <br />
-            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">Documents</span>
-            <span className="text-gray-900"> in Minutes</span>
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed">
-            Save time and money by instantly understanding your legal documents.
-          </p>
-          <p className="text-lg text-gray-500 mb-10 max-w-3xl mx-auto">
-            Our AI-powered platform helps small businesses and professionals decode complex legal language with confidence.
-          </p>
-          
-          <div className="flex items-center justify-center gap-4">
-              <Link
-                to="/upload"
-                className="inline-flex items-center justify-center rounded-lg text-white font-medium"
-              >
-              <button className="group bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 hover:shadow-2xl hover:shadow-indigo-500/50 transition-all flex items-center gap-2 hover:scale-110 active:scale-95 transform">
-                Start for Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-              </button>
-            </Link>
-            <a
-              href="#features"
-              className="inline-flex items-center justify-center rounded-lg text-slate-800 font-medium"
-            >
-              <button className="inline-flex flex-row items-center justify-center bg-gray-100 border border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-200 hover:border-indigo-400 hover:text-indigo-600 hover:shadow-lg transition-all hover:scale-105 active:scale-95 transform">
-                  Learn More
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </button>
-            </a>
           </div>
         </div>
       </section>
 
-      {/* Quick Analyze */}
-      <section id="#quick" className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-              Try quick analysis — paste text or scan an image
-            </h2>
-            <p className="text-sm text-slate-600 mt-1">
-              No file upload needed. Get a fast summary and risks in seconds.
-            </p>
+      <section id="quick" className="py-6" style={reveal(60)}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="mb-3">
+            <h2 className="text-xl font-bold text-slate-900">Try Quick Analysis</h2>
+            <p className="text-slate-600 mt-1">Paste text or scan an image to preview analysis in seconds.</p>
           </div>
           <QuickAnalyze
+            compact
             navigateToAnalysis={(data) =>
               navigate('/analysis', {
-                state: { analysisData: { ...data, documentName: 'Quick Analysis' } },
+                state: { analysisData: { ...data, documentName: 'Quick Analysis' } }
               })
             }
           />
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="bg-gray-50 py-20">
+      <section id="features" className="py-16 bg-white border-y border-slate-200" style={reveal(90)}>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Built to help you understand, not overwhelm
-            </h2>
-            <p className="text-xl text-gray-600">Three core tools to make any document clear and actionable.</p>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-900">Built for clear decisions</h2>
+            <p className="text-lg text-slate-600 mt-3">Everything is optimized for readability and action.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-all">
-                <Sparkles className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors">At a Glance Summary</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Get a plain-language overview with key risks, important dates, and money terms so you can decide faster.
-              </p>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Overall risk level</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Important dates & deadlines</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Fees, penalties, and amounts</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-all">
-                <Search className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors">Interactive Clause Explorer</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Drill into clauses, see plain-English explanations, and understand implications.
-              </p>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Search & filter clauses</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Plain-English explanations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Actionable suggestions</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-all">
-                <MessageSquare className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors">AI-Powered Q&A Chat</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Ask natural questions about the document and get answers with clause references.
-              </p>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Context-aware answers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Clause citations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 mt-1 font-bold">•</span>
-                  <span>Follow-up suggestions</span>
-                </li>
-              </ul>
-            </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {features.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="rounded-xl border border-slate-200 bg-slate-50 p-6 hover:shadow-lg transition-shadow" style={reveal(140)}>
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">{item.title}</h3>
+                  <p className="text-slate-600 mt-2">{item.description}</p>
+                  <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                    {item.bullets.map((b) => (
+                      <li key={b} className="flex items-start gap-2">
+                        <span className="text-blue-600">-</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="bg-white py-20">
+      <section className="py-16 bg-slate-100 border-y border-slate-200" style={reveal(120)}>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">How it works</h2>
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-slate-900">See the difference instantly</h2>
+            <p className="text-lg text-slate-600 mt-3">From dense legal text to clear, actionable output.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:scale-110 transition-all">
-                <Upload className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-              </div>
-              <div className="text-indigo-600 font-semibold mb-3">Step 1</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Upload your document</h3>
-              <p className="text-gray-600 leading-relaxed">
-                PDF or DOCX. We extract text and keep your data private.
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-6" style={reveal(160)}>
+              <p className="text-xs font-semibold text-rose-700 uppercase tracking-wide mb-3">Before</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Raw legal language</h3>
+              <p className="text-slate-700 leading-relaxed">
+                \"The Licensee shall pay monthly compensation within five days, failing which penalty and default consequences may apply under this agreement.\"
               </p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <li>- Hard to read quickly</li>
+                <li>- Risk buried in legal wording</li>
+                <li>- No clear action plan</li>
+              </ul>
             </div>
 
-            {/* Step 2 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:scale-110 transition-all">
-                <FileText className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6" style={reveal(220)}>
+              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-3">After</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Doclarity output</h3>
+              <ul className="space-y-2 text-slate-700">
+                <li>- Payment due within 5 days each month</li>
+                <li>- Late payment can trigger penalty/default risk</li>
+                <li>- Negotiate grace period before penalty</li>
+                <li>- Track due date in calendar immediately</li>
+              </ul>
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white border border-emerald-300 px-3 py-1 text-sm text-emerald-700">
+                <CheckCircle2 className="w-4 h-4" />
+                Easy to understand and act on
               </div>
-              <div className="text-indigo-600 font-semibold mb-3">Step 2</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI analyzes it</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Identifies key terms, risky clauses, financials, and deadlines.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-2xl hover:border-indigo-300 transition-all hover:-translate-y-1 group">
-              <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:scale-110 transition-all">
-                <Clock className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
-              </div>
-              <div className="text-indigo-600 font-semibold mb-3">Step 3</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Understand in minutes</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Read the summary, explore clauses, and chat with the AI for clarity.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-12 text-center shadow-2xl hover:shadow-3xl transition-all hover:scale-[1.02]">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to simplify your legal documents?
-            </h2>
-            <p className="text-xl text-indigo-100 mb-8">
-              Join thousands of professionals who trust our AI-powered platform.
-            </p>
-            <Link
-              to="/upload"
-              className="inline-flex items-center justify-center rounded-lg text-white font-medium"
-            >
-              <button className="bg-white text-indigo-600 px-10 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 hover:shadow-2xl hover:shadow-white/30 transition-all hover:scale-110 active:scale-95 transform">
-                Get Started Now
-              </button>
-            </Link>
+      <section className="py-16" style={reveal(130)}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-900">Who this helps most</h2>
+            <p className="text-lg text-slate-600 mt-3">Designed for real people handling legal documents every day.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {useCases.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="rounded-xl border border-slate-200 bg-white p-6">
+                  <div className="w-11 h-11 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">{item.title}</h3>
+                  <p className="text-slate-600 mt-2">{item.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
+      <section className="py-16 bg-white border-y border-slate-200" style={reveal(140)}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-900">How it works</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.title} className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+                  <div className="text-sm font-semibold text-blue-700 mb-3">Step {index + 1}</div>
+                  <div className="w-11 h-11 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">{step.title}</h3>
+                  <p className="text-slate-600 mt-2">{step.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" className="py-16" style={reveal(160)}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-slate-900">Simple pricing</h2>
+            <p className="text-lg text-slate-600 mt-3">Start free and upgrade when your team needs more.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 mb-4">
+                <Zap className="w-3 h-3" />
+                Free Starter
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900">For Individuals</h3>
+              <p className="text-slate-600 mt-2">Perfect for occasional contract reviews.</p>
+              <ul className="mt-6 space-y-2 text-slate-700">
+                <li>- Upload and analyze documents</li>
+                <li>- Risk summary and clause explorer</li>
+                <li>- AI chat with grounded answers</li>
+              </ul>
+              <Link to="/upload" className="mt-6 inline-flex items-center rounded-lg bg-blue-600 px-5 py-3 text-white font-semibold hover:bg-blue-700">
+                Start Free
+              </Link>
+            </div>
+
+            <div className="rounded-2xl border-2 border-blue-300 bg-blue-50 p-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-700 mb-4">
+                <Lock className="w-3 h-3" />
+                Pro (Coming Soon)
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900">For Teams</h3>
+              <p className="text-slate-600 mt-2">Built for frequent contract operations and collaboration.</p>
+              <ul className="mt-6 space-y-2 text-slate-700">
+                <li>- Higher usage limits</li>
+                <li>- Team workspaces and sharing</li>
+                <li>- Export-ready legal briefs</li>
+              </ul>
+              <Link to="/help" className="mt-6 inline-flex items-center rounded-lg border border-blue-400 px-5 py-3 text-blue-700 font-semibold hover:bg-blue-100">
+                Join Waitlist
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-slate-900" style={reveal(180)}>
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold text-white">Ready to decode your next legal document?</h2>
+          <p className="text-slate-300 text-lg mt-4">Upload now and get a clear, decision-ready breakdown.</p>
+          <Link
+            to="/upload"
+            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-white px-7 py-3 text-slate-900 font-semibold hover:bg-slate-100"
+          >
+            Analyze Document
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       <section id="faq" className="py-12 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FAQ
-            title="Questions"
-            subtitle="Everything you need to know."
-          />
+          <FAQ title="Questions" subtitle="Everything you need to know." />
         </div>
       </section>
-
     </div>
   );
 };

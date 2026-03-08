@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Send, Bot, User, Loader, Copy, Mic, Square } from 'lucide-react';
 import axios from 'axios';
 
 const badgeStyle = {
@@ -7,6 +7,13 @@ const badgeStyle = {
   medium: 'bg-amber-100 text-amber-700 border border-amber-300',
   low: 'bg-rose-100 text-rose-700 border border-rose-300'
 };
+
+const LANGUAGES = [
+  { value: 'english', label: 'English' },
+  { value: 'hindi', label: 'Hindi' },
+  { value: 'marathi', label: 'Marathi' },
+  { value: 'spanish', label: 'Spanish' }
+];
 
 const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
   const [messages, setMessages] = useState([
@@ -19,14 +26,18 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [responseLanguage, setResponseLanguage] = useState('english');
   const [suggestedQuestions, setSuggestedQuestions] = useState([
     'What are the main risks in this document?',
     'Can you explain the termination clause?',
     'What are my obligations under this agreement?',
     'Are there any hidden fees or penalties?'
   ]);
+  const [speechInputSupported, setSpeechInputSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,6 +53,62 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
       inputRef.current?.focus();
     }
   }, [externalPrompt]);
+
+  useEffect(() => {
+    const SpeechRecognition = typeof window !== 'undefined'
+      ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+      : null;
+    setSpeechInputSupported(Boolean(SpeechRecognition));
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  const getSpeechInputLang = () => {
+    if (responseLanguage === 'hindi') return 'hi-IN';
+    if (responseLanguage === 'marathi') return 'mr-IN';
+    if (responseLanguage === 'spanish') return 'es-ES';
+    return 'en-IN';
+  };
+
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    if (isListening) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = getSpeechInputLang();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInputMessage(String(transcript || '').trim());
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    if (!recognitionRef.current) return;
+    recognitionRef.current.stop();
+    setIsListening(false);
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -63,7 +130,10 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
         message: inputMessage,
         documentContext,
         ragDocId: documentContext?.ragDocId,
-        conversationHistory: historyForServer
+        conversationHistory: historyForServer,
+        responseLanguage
+      }, {
+        timeout: 100000
       });
 
       const botMessage = {
@@ -81,11 +151,14 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
       if (response.data.suggestedQuestions) {
         setSuggestedQuestions(response.data.suggestedQuestions);
       }
-    } catch {
+    } catch (error) {
+      const details = error?.code === 'ECONNABORTED'
+        ? 'The model timed out. Try a shorter question or a smaller model.'
+        : (error?.response?.data?.message || 'Please try again.');
       const errorMessage = {
         id: messages.length + 2,
         type: 'bot',
-        content: 'I encountered an error while processing your question. Please try again.',
+        content: `I encountered an error while processing your question. ${details}`,
         isError: true,
         timestamp: new Date()
       };
@@ -111,20 +184,8 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
     navigator.clipboard.writeText(text);
   };
 
-  const handleFeedback = (messageId, feedback) => {
-    axios.post('/api/chat/feedback', {
-      messageId,
-      feedback,
-      documentContext: documentContext?.id
-    });
-
-    setMessages((prev) => prev.map((msg) =>
-      msg.id === messageId ? { ...msg, feedback } : msg
-    ));
-  };
-
   return (
-    <div className="bg-white rounded-lg shadow-lg flex flex-col h-[600px]">
+    <div className="bg-white rounded-lg shadow-lg flex flex-col h-[72vh] min-h-[520px] lg:h-[78vh] lg:min-h-[680px]">
       <div className="bg-primary-600 text-white p-4 rounded-t-lg">
         <div className="flex items-center gap-3">
           <div className="bg-white/20 p-2 rounded-full">
@@ -135,6 +196,18 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
             <p className="text-sm text-primary-100">RAG-grounded answers from your uploaded document</p>
           </div>
         </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-xs text-primary-100">Explain in:</span>
+          <select
+            value={responseLanguage}
+            onChange={(e) => setResponseLanguage(e.target.value)}
+            className="text-xs bg-white text-slate-800 rounded-md px-2 py-1 border border-primary-300"
+          >
+            {LANGUAGES.map((lang) => (
+              <option key={lang.value} value={lang.value}>{lang.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -143,7 +216,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
             key={message.id}
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`max-w-[80%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
+            <div className={`max-w-[92%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
               <div className="flex items-start gap-2">
                 {message.type === 'bot' && (
                   <div className="bg-primary-100 p-2 rounded-full">
@@ -207,28 +280,6 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
                       >
                         <Copy className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleFeedback(message.id, 'positive')}
-                        className={`p-1 ${
-                          message.feedback === 'positive'
-                            ? 'text-success-600'
-                            : 'text-slate-400 hover:text-success-600'
-                        }`}
-                        title="Helpful response"
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleFeedback(message.id, 'negative')}
-                        className={`p-1 ${
-                          message.feedback === 'negative'
-                            ? 'text-danger-600'
-                            : 'text-slate-400 hover:text-danger-600'
-                        }`}
-                        title="Not helpful"
-                      >
-                        <ThumbsDown className="w-4 h-4" />
-                      </button>
                     </div>
                   )}
                 </div>
@@ -259,7 +310,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
         <div className="px-4 pb-2">
           <p className="text-xs text-slate-500 mb-2">Suggested questions:</p>
           <div className="flex flex-wrap gap-2">
-            {suggestedQuestions.slice(0, 3).map((question, index) => (
+            {suggestedQuestions.slice(0, 2).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedQuestion(question)}
@@ -273,6 +324,11 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
       )}
 
       <div className="border-t border-gray-200 p-4">
+        {!speechInputSupported && (
+          <p className="text-xs text-slate-500 mb-2">
+            Voice input is not supported in this browser.
+          </p>
+        )}
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -284,6 +340,20 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             disabled={isLoading}
           />
+          {speechInputSupported && (
+            <button
+              onClick={isListening ? stopListening : startListening}
+              disabled={isLoading}
+              className={`p-2 rounded-lg transition-colors ${
+                isListening
+                  ? 'bg-danger-600 text-white hover:bg-danger-700'
+                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+              }`}
+              title={isListening ? 'Stop voice input' : 'Start voice input'}
+            >
+              {isListening ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </button>
+          )}
           <button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
@@ -298,4 +368,3 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
 };
 
 export default AIChatBot;
-

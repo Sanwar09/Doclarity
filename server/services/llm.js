@@ -48,6 +48,7 @@ async function geminiStructuredAnswer({ systemInstruction, history, contextPacke
 async function ollamaStructuredAnswer({ systemInstruction, history, contextPacket, message }) {
   const baseUrl = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
   const model = process.env.OLLAMA_CHAT_MODEL || 'llama3.1:8b';
+  const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 90000);
 
   const messages = [
     { role: 'system', content: `${systemInstruction}\n\nReturn only JSON.` },
@@ -63,17 +64,30 @@ async function ollamaStructuredAnswer({ systemInstruction, history, contextPacke
     }
   ];
 
-  const resp = await fetch(`${baseUrl}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: false,
-      format: 'json',
-      options: { temperature: 0.2 }
-    })
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let resp;
+  try {
+    resp = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: false,
+        format: 'json',
+        options: { temperature: 0.2 }
+      }),
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err?.name === 'AbortError') {
+      throw new Error(`Ollama chat timed out after ${timeoutMs}ms`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!resp.ok) {
     const t = await resp.text();

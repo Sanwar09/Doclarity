@@ -56,13 +56,14 @@ export function retrieveTopChunks(ragDocId, query, topK = 5) {
   const scored = doc.chunks.map((chunk) => {
     const lexical = bm25Score(qTokens, chunk, doc);
     const phraseBoost = phraseOverlapBoost(query, chunk.text);
+    const termCoverage = coverageBoost(qTokens, chunk.tokens);
     const importanceBoost = chunk.importance === 'high' ? 1.2 : chunk.importance === 'medium' ? 0.5 : 0;
-    const score = lexical + phraseBoost + importanceBoost;
+    const score = lexical + phraseBoost + termCoverage + importanceBoost;
     return { ...chunk, score };
   });
 
   return scored
-    .filter((c) => c.score > 0)
+    .filter((c) => c.score >= 1.2)
     .sort((a, b) => b.score - a.score)
     .slice(0, topK);
 }
@@ -108,7 +109,7 @@ function chunkText(text, targetChars = 850, minChars = 120) {
   const paras = String(text || '')
     .split(/\n{2,}/g)
     .map((p) => p.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
+    .filter((p) => p && !isNoisyParagraph(p));
 
   const chunks = [];
   let buf = '';
@@ -224,6 +225,26 @@ function tokenize(text) {
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/g)
     .filter((w) => w.length > 2 && !STOPWORDS.has(w));
+}
+
+function coverageBoost(queryTokens, chunkTokens) {
+  const set = new Set(chunkTokens);
+  const matched = queryTokens.filter((q) => set.has(q)).length;
+  if (!queryTokens.length) return 0;
+  const ratio = matched / queryTokens.length;
+  return ratio >= 0.6 ? 1.2 : ratio >= 0.35 ? 0.6 : 0;
+}
+
+function isNoisyParagraph(text = '') {
+  const s = String(text).trim();
+  if (!s) return true;
+  if (s.length < 80) return true;
+  const digits = (s.match(/\d/g) || []).length;
+  const letters = (s.match(/[a-z]/gi) || []).length;
+  if (digits > 30 && letters < 40) return true;
+  if (/Page\s+\d+\s+of\s+\d+/i.test(s)) return true;
+  if (/GRN|Transaction Id|Stamp Duty|Registration Fee/i.test(s)) return true;
+  return false;
 }
 
 function evictOldestIfNeeded() {

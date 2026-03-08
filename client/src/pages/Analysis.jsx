@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AtAGlanceSummary from '../components/Summary';
 import ClauseExplorer from '../components/ClauseExplorer';
 import AIChatBot from '../components/AIChatBot';
+import ActionCenter from '../components/ActionCenter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { generateAnalysisReport } from '../services/pdfGenerator';
 import { Download, Share2, ArrowLeft } from 'lucide-react';
@@ -36,6 +37,10 @@ const Analysis = () => {
     setActiveTab('clauses');
     setSelectedClauseId(clause?.id || null);
     setChatDraft(`Explain this clause and negotiation tips: ${clause?.title || 'Selected clause'}`);
+  };
+
+  const handleAskAction = (prompt) => {
+    setChatDraft(prompt);
   };
 
   const handleDownloadReport = () => {
@@ -93,16 +98,17 @@ const Analysis = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="summary">Summary</TabsTrigger>
                 <TabsTrigger value="clauses">Clause Explorer</TabsTrigger>
+                <TabsTrigger value="actions">Action Center</TabsTrigger>
               </TabsList>
 
               <TabsContent value="summary" className="mt-6">
-                <AtAGlanceSummary summary={analysisData.summary} />
+                <AtAGlanceSummary summary={analysisData.summary} clauses={analysisData.clauses} />
               </TabsContent>
 
               <TabsContent value="clauses" className="mt-6">
@@ -112,10 +118,17 @@ const Analysis = () => {
                   onAskClause={handleAskClause}
                 />
               </TabsContent>
+
+              <TabsContent value="actions" className="mt-6">
+                <ActionCenter
+                  analysisData={analysisData}
+                  onAskAction={handleAskAction}
+                />
+              </TabsContent>
             </Tabs>
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <AIChatBot
               documentContext={analysisData}
               onClauseReference={handleClauseReference}

@@ -3,14 +3,13 @@ import axios from 'axios';
 import { Camera, Clipboard, Image as ImageIcon, Loader2 } from 'lucide-react';
 import ImageAcquire from '../components/ImageAcquire';
 
-const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
-  const [mode, setMode] = useState('image'); // 'paste' | 'image'
+const QuickAnalyze = ({ onResult, navigateToAnalysis, compact = false }) => {
+  const [mode, setMode] = useState('image');
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [imgPreview, setImgPreview] = useState(null);
   const [imgFile, setImgFile] = useState(null);
 
-  // Optional compression helper (kept from your code)
   const compressImage = (file, maxW = 1600, quality = 0.8) =>
     new Promise((resolve, reject) => {
       const img = new Image();
@@ -36,7 +35,6 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
       img.src = url;
     });
 
-  // ImageAcquire handlers
   const handleSelectFile = async (file) => {
     setImgFile(file);
     setImgPreview(URL.createObjectURL(file));
@@ -63,12 +61,11 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
         navigateToAnalysis?.(data);
       } else {
         if (!imgFile) return alert('Please select an image first');
-        // Compress (optional; comment out if not needed)
         const compressed = await compressImage(imgFile);
         const form = new FormData();
         form.append('image', compressed);
         const { data } = await axios.post('/api/analyze/image', form, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: { 'Content-Type': 'multipart/form-data' }
         });
         onResult?.(data);
         navigateToAnalysis?.(data);
@@ -83,11 +80,10 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
   const canSubmit = mode === 'paste' ? text.trim().length >= 30 : Boolean(imgFile);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <h3 className="text-lg font-semibold text-slate-900">Quick analysis</h3>
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${compact ? 'p-4' : 'p-5'}`}>
+      <div className={`flex items-center justify-between gap-2 ${compact ? 'mb-3' : 'mb-4'}`}>
+        <h3 className={`${compact ? 'text-base' : 'text-lg'} font-semibold text-slate-900`}>Quick analysis</h3>
 
-        {/* Mode toggle */}
         <div className="inline-flex bg-slate-100 rounded-lg p-0.5">
           <button
             onClick={() => setMode('paste')}
@@ -115,13 +111,13 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
       {mode === 'paste' ? (
         <div>
           <textarea
-            rows={6}
-            placeholder="Paste copied contract text here (at least ~30 characters)…"
+            rows={compact ? 4 : 6}
+            placeholder="Paste copied contract text here (at least ~30 characters)..."
             className="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          <p className="text-xs text-slate-500 mt-2">Tip: Use Ctrl/Cmd+V to paste quickly.</p>
+          {!compact && <p className="text-xs text-slate-500 mt-2">Tip: Use Ctrl/Cmd+V to paste quickly.</p>}
         </div>
       ) : (
         <div>
@@ -133,21 +129,23 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
           />
 
           {imgPreview && (
-            <div className="mt-3">
+            <div className={compact ? 'mt-2' : 'mt-3'}>
               <img
                 src={imgPreview}
                 alt="Preview"
-                className="max-h-64 rounded-md border border-slate-200"
+                className={`${compact ? 'max-h-44' : 'max-h-64'} rounded-md border border-slate-200`}
               />
-              <p className="text-xs text-slate-500 mt-2">
-                Keep the image sharp and well-lit. We run OCR with Tesseract (on server).
-              </p>
+              {!compact && (
+                <p className="text-xs text-slate-500 mt-2">
+                  Keep the image sharp and well-lit. We run OCR with Tesseract (on server).
+                </p>
+              )}
             </div>
           )}
         </div>
       )}
 
-      <div className="mt-4 flex items-center justify-end gap-3">
+      <div className={`${compact ? 'mt-3' : 'mt-4'} flex items-center justify-end gap-3`}>
         <button
           onClick={submit}
           disabled={!canSubmit || loading}
@@ -158,9 +156,11 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis }) => {
         </button>
       </div>
 
-      <p className="text-[11px] text-slate-500 mt-3">
-        By using quick analysis, you agree that pasted text or images will be processed securely for analysis.
-      </p>
+      {!compact && (
+        <p className="text-[11px] text-slate-500 mt-3">
+          By using quick analysis, you agree that pasted text or images will be processed securely for analysis.
+        </p>
+      )}
     </div>
   );
 };

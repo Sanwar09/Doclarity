@@ -163,7 +163,14 @@ function extractDates(text) {
 function extractMoney(text) {
   const out = [];
   const seen = new Set();
-  const patterns = [/\$[\d,]+\.?\d*/g, /\d+\.?\d*\s*%/g, /USD\s*[\d,]+\.?\d*/gi];
+  const patterns = [
+    /\$[\d,]+\.?\d*/g,
+    /USD\s*[\d,]+\.?\d*/gi,
+    /INR\s*[\d,]+\.?\d*/gi,
+    /Rs\.?\s*[\d,]+\.?\d*/gi,
+    /Rupees?\s*[\d,]+\.?\d*/gi,
+    /\d+\.?\d*\s*%/g
+  ];
   for (const pattern of patterns) {
     const matches = text.match(pattern) || [];
     for (const m of matches) {

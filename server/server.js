@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import uploadRoute from './routes/upload.js';
 import analyzeRoute from './routes/analyze.js';
 import chatRoute from "./routes/chat.js";
+import compareRoute from './routes/compare.js';
+import authRoute from './routes/auth.js';
 import secure from './routes/secure.js';
 
 dotenv.config();
@@ -17,9 +19,11 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/me', secure);
+app.use('/api/auth', authRoute);
 app.use('/api/upload', uploadRoute);
 app.use('/api/analyze', analyzeRoute);
 app.use('/api/chat', chatRoute);
+app.use('/api/compare', compareRoute);
 // Readiness endpoints so Passenger’s first probe gets a fast 200
 app.get('/', (_req, res) => res.status(200).send('OK'));
 app.get('/api', (_req, res) => res.status(200).send('OK'));
@@ -28,4 +32,3 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, port: PORT, ts: new D
 app.listen(PORT, () => {
   console.log(`[passenger] Node app listening on port ${PORT}`);
 });
-

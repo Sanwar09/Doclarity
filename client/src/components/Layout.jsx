@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import {
   FileText,
   Home,
@@ -24,7 +23,7 @@ const Layout = ({ children }) => {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -39,7 +38,7 @@ const Layout = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      logout();
       navigate('/login');
     } catch {
       // ignore
