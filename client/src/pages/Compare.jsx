@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Scale, AlertTriangle, CalendarClock, Wallet } from 'lucide-react';
+import { api } from '../services/api';
 
 const Compare = () => {
   const [fileA, setFileA] = useState(null);
@@ -19,7 +19,7 @@ const Compare = () => {
       form.append('fileA', fileA);
       form.append('fileB', fileB);
 
-      const { data } = await axios.post('/api/compare', form, {
+      const { data } = await api.post('/compare', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 120000
       });

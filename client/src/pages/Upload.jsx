@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UploadCloud, FileText, AlertCircle } from 'lucide-react';
+import { api } from '../services/api';
 
 const Upload = () => {
   const [file, setFile] = useState(null);
@@ -30,14 +30,14 @@ const Upload = () => {
       formData.append('file', file);
       formData.append('docType', docType);
 
-      const uploadRes = await axios.post('/api/upload', formData, {
+      const uploadRes = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       const { docId, originalName } = uploadRes.data;
 
       // 2) Analyze document (synchronous for MVP)
-      const analyzeRes = await axios.post('/api/analyze', {
+      const analyzeRes = await api.post('/analyze', {
         docId,
         docType: docType === 'auto' ? undefined : docType,
         documentName: originalName || file.name,

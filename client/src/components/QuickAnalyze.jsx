@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Camera, Clipboard, Image as ImageIcon, Loader2 } from 'lucide-react';
 import ImageAcquire from '../components/ImageAcquire';
+import { api } from '../services/api';
 
 const QuickAnalyze = ({ onResult, navigateToAnalysis, compact = false }) => {
   const [mode, setMode] = useState('image');
@@ -56,7 +56,7 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis, compact = false }) => {
     try {
       setLoading(true);
       if (mode === 'paste') {
-        const { data } = await axios.post('/api/analyze/text', { text });
+        const { data } = await api.post('/analyze/text', { text });
         onResult?.(data);
         navigateToAnalysis?.(data);
       } else {
@@ -64,7 +64,7 @@ const QuickAnalyze = ({ onResult, navigateToAnalysis, compact = false }) => {
         const compressed = await compressImage(imgFile);
         const form = new FormData();
         form.append('image', compressed);
-        const { data } = await axios.post('/api/analyze/image', form, {
+        const { data } = await api.post('/analyze/image', form, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         onResult?.(data);

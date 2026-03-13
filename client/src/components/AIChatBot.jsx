@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader, Copy, Mic, Square } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../services/api';
 
 const badgeStyle = {
   high: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
@@ -126,7 +126,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
 
     const historyForServer = messages.filter((m, idx) => !(idx === 0 && m.type === 'bot'));
     try {
-      const response = await axios.post('/api/chat', {
+      const response = await api.post('/chat', {
         message: inputMessage,
         documentContext,
         ragDocId: documentContext?.ragDocId,

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Clipboard, LifeBuoy, Link as LinkIcon, RefreshCw, Search, Shield, UploadCloud, Camera, Sparkles } from 'lucide-react';
+import { buildApiUrl } from '../services/api';
 
 const Section = ({ id, title, icon: Icon, children }) => (
   <section id={id} className="bg-white border border-slate-200 rounded-xl p-5">
@@ -64,7 +65,7 @@ export default function Help() {
 
   const testAPI = async () => {
     try {
-      const res = await fetch('/api/health', { cache: 'no-store' });
+      const res = await fetch(buildApiUrl('/health'), { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json().catch(() => ({}));
       setApiStatus({ ok: true, data });
