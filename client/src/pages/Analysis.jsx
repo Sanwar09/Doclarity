@@ -6,7 +6,7 @@ import AIChatBot from '../components/AIChatBot';
 import ActionCenter from '../components/ActionCenter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { generateAnalysisReport } from '../services/pdfGenerator';
-import { Download, Share2, ArrowLeft } from 'lucide-react';
+import { Download, Share2, ArrowLeft, Bot, X } from 'lucide-react';
 
 const Analysis = () => {
   const location = useLocation();
@@ -15,6 +15,7 @@ const Analysis = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [selectedClauseId, setSelectedClauseId] = useState(null);
   const [chatDraft, setChatDraft] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (location.state?.analysisData) {
@@ -37,10 +38,12 @@ const Analysis = () => {
     setActiveTab('clauses');
     setSelectedClauseId(clause?.id || null);
     setChatDraft(`Explain this clause and negotiation tips: ${clause?.title || 'Selected clause'}`);
+    setIsChatOpen(true);
   };
 
   const handleAskAction = (prompt) => {
     setChatDraft(prompt);
+    setIsChatOpen(true);
   };
 
   const handleDownloadReport = () => {
@@ -98,45 +101,70 @@ const Analysis = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="summary">Summary</TabsTrigger>
-                <TabsTrigger value="clauses">Clause Explorer</TabsTrigger>
-                <TabsTrigger value="actions">Action Center</TabsTrigger>
-              </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="summary">Summary</TabsTrigger>
+            <TabsTrigger value="clauses">Clause Explorer</TabsTrigger>
+            <TabsTrigger value="actions">Action Center</TabsTrigger>
+          </TabsList>
 
-              <TabsContent value="summary" className="mt-6">
-                <AtAGlanceSummary summary={analysisData.summary} clauses={analysisData.clauses} />
-              </TabsContent>
+          <TabsContent value="summary" className="mt-6">
+            <AtAGlanceSummary summary={analysisData.summary} clauses={analysisData.clauses} />
+          </TabsContent>
 
-              <TabsContent value="clauses" className="mt-6">
-                <ClauseExplorer
-                  clauses={analysisData.clauses}
-                  selectedClauseId={selectedClauseId}
-                  onAskClause={handleAskClause}
-                />
-              </TabsContent>
+          <TabsContent value="clauses" className="mt-6">
+            <ClauseExplorer
+              clauses={analysisData.clauses}
+              selectedClauseId={selectedClauseId}
+              onAskClause={handleAskClause}
+            />
+          </TabsContent>
 
-              <TabsContent value="actions" className="mt-6">
-                <ActionCenter
-                  analysisData={analysisData}
-                  onAskAction={handleAskAction}
-                />
-              </TabsContent>
-            </Tabs>
+          <TabsContent value="actions" className="mt-6">
+            <ActionCenter
+              analysisData={analysisData}
+              onAskAction={handleAskAction}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+        {!isChatOpen && (
+          <div className="hidden sm:block rounded-2xl bg-slate-900 text-white px-4 py-3 shadow-lg max-w-xs">
+            <p className="text-sm font-medium">Need help understanding this document?</p>
+            <p className="text-xs text-slate-300 mt-1">Ask the assistant in English, Hindi, Marathi, or Spanish.</p>
           </div>
+        )}
 
-          <div className="lg:col-span-2">
+        <button
+          type="button"
+          onClick={() => setIsChatOpen((prev) => !prev)}
+          className="h-16 w-16 rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+          aria-label={isChatOpen ? 'Close legal assistant' : 'Open legal assistant'}
+        >
+          {isChatOpen ? <X className="w-7 h-7" /> : <Bot className="w-7 h-7" />}
+        </button>
+      </div>
+
+      {isChatOpen && (
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 bg-slate-950/30 backdrop-blur-[2px] z-40"
+            onClick={() => setIsChatOpen(false)}
+            aria-label="Close assistant overlay"
+          />
+          <div className="fixed z-50 bottom-24 right-4 left-4 sm:left-auto sm:right-6 sm:w-[430px] lg:w-[460px]">
             <AIChatBot
               documentContext={analysisData}
               onClauseReference={handleClauseReference}
               externalPrompt={chatDraft}
+              className="w-full"
             />
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

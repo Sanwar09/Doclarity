@@ -15,7 +15,7 @@ const LANGUAGES = [
   { value: 'spanish', label: 'Spanish' }
 ];
 
-const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
+const AIChatBot = ({ documentContext, onClauseReference, externalPrompt, className = '' }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -185,23 +185,23 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg flex flex-col h-[72vh] min-h-[520px] lg:h-[78vh] lg:min-h-[680px]">
-      <div className="bg-primary-600 text-white p-4 rounded-t-lg">
+    <div className={`bg-white rounded-[28px] shadow-2xl border border-slate-200/80 flex flex-col h-[70vh] min-h-[520px] max-h-[760px] overflow-hidden ${className}`}>
+      <div className="bg-gradient-to-br from-primary-600 via-primary-600 to-primary-700 text-white p-5">
         <div className="flex items-center gap-3">
-          <div className="bg-white/20 p-2 rounded-full">
+          <div className="bg-white/20 p-2.5 rounded-2xl shadow-inner">
             <Bot className="w-6 h-6" />
           </div>
           <div>
             <h3 className="font-semibold text-lg">AI Legal Assistant</h3>
-            <p className="text-sm text-primary-100">RAG-grounded answers from your uploaded document</p>
+            <p className="text-sm text-primary-100">Ask in your language and get grounded answers from this document</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          <span className="text-xs text-primary-100">Explain in:</span>
+        <div className="mt-4 flex items-center gap-2">
+          <span className="text-xs text-primary-100 uppercase tracking-[0.18em]">Language</span>
           <select
             value={responseLanguage}
             onChange={(e) => setResponseLanguage(e.target.value)}
-            className="text-xs bg-white text-slate-800 rounded-md px-2 py-1 border border-primary-300"
+            className="text-xs bg-white text-slate-800 rounded-xl px-3 py-2 border border-primary-300 shadow-sm"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.value} value={lang.value}>{lang.label}</option>
@@ -210,7 +210,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto bg-slate-50/80 p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -219,14 +219,14 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
             <div className={`max-w-[92%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
               <div className="flex items-start gap-2">
                 {message.type === 'bot' && (
-                  <div className="bg-primary-100 p-2 rounded-full">
+                  <div className="bg-primary-100 p-2 rounded-2xl">
                     <Bot className="w-4 h-4 text-primary-600" />
                   </div>
                 )}
 
                 <div>
                   <div
-                    className={`rounded-lg p-3 ${
+                    className={`rounded-2xl p-3.5 shadow-sm ${
                       message.type === 'user'
                         ? 'bg-primary-600 text-white'
                         : message.isError
@@ -245,7 +245,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
                     )}
 
                     {message.references && message.references.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-gray-300">
+                      <div className="mt-2 pt-2 border-t border-gray-300/80">
                         <p className="text-xs font-medium mb-1">References:</p>
                         {message.references.slice(0, 4).map((ref, index) => (
                           <button
@@ -260,7 +260,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
                     )}
 
                     {message.nextActions?.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-gray-300">
+                      <div className="mt-2 pt-2 border-t border-gray-300/80">
                         <p className="text-xs font-medium mb-1">Suggested next actions:</p>
                         <ul className="text-xs space-y-1">
                           {message.nextActions.slice(0, 3).map((action, idx) => (
@@ -285,7 +285,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
                 </div>
 
                 {message.type === 'user' && (
-                  <div className="bg-slate-200 p-2 rounded-full">
+                  <div className="bg-slate-200 p-2 rounded-2xl">
                     <User className="w-4 h-4 text-slate-600" />
                   </div>
                 )}
@@ -296,7 +296,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-slate-100 rounded-lg p-3 flex items-center gap-2">
+            <div className="bg-white rounded-2xl p-3 flex items-center gap-2 shadow-sm border border-slate-200">
               <Loader className="w-4 h-4 animate-spin text-primary-600" />
               <span className="text-slate-600">Retrieving relevant clauses and answering...</span>
             </div>
@@ -307,14 +307,14 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
       </div>
 
       {suggestedQuestions.length > 0 && (
-        <div className="px-4 pb-2">
-          <p className="text-xs text-slate-500 mb-2">Suggested questions:</p>
+        <div className="px-4 pb-3">
+          <p className="text-xs text-slate-500 mb-2">Suggested questions</p>
           <div className="flex flex-wrap gap-2">
             {suggestedQuestions.slice(0, 2).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedQuestion(question)}
-                className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded-full transition-colors"
+                className="text-xs bg-white hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full transition-colors border border-slate-200"
               >
                 {question}
               </button>
@@ -323,7 +323,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
         </div>
       )}
 
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-gray-200 bg-white p-4">
         {!speechInputSupported && (
           <p className="text-xs text-slate-500 mb-2">
             Voice input is not supported in this browser.
@@ -337,14 +337,14 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask a question about your document..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 bg-slate-50"
             disabled={isLoading}
           />
           {speechInputSupported && (
             <button
               onClick={isListening ? stopListening : startListening}
               disabled={isLoading}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-3 rounded-2xl transition-colors shadow-sm ${
                 isListening
                   ? 'bg-danger-600 text-white hover:bg-danger-700'
                   : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
@@ -357,7 +357,7 @@ const AIChatBot = ({ documentContext, onClauseReference, externalPrompt }) => {
           <button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
-            className="bg-primary-600 text-white p-2 rounded-lg hover:bg-primary-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+            className="bg-primary-600 text-white p-3 rounded-2xl hover:bg-primary-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors shadow-sm"
           >
             <Send className="w-5 h-5" />
           </button>
