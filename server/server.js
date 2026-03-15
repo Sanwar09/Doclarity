@@ -13,14 +13,21 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const allowedOrigin = process.env.ALLOWED_ORIGIN || '';
+const allowedOrigins = (process.env.ALLOWED_ORIGIN || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
 
 app.set('trust proxy', 1);
 
 app.use(cors({
-  origin: allowedOrigin
-    ? [allowedOrigin]
-    : true,
+  origin(origin, callback) {
+    // Allow server-to-server tools and same-origin requests without an Origin header.
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.length === 0) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 app.use(express.json());
