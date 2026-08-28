@@ -4,18 +4,18 @@ Doclarity is an AI-powered legal document intelligence platform. Users can uploa
 
 ---
 
-## 🌐 Project Information Hub (`index.html`)
+## 🌐 Project Information Dashboard (`dashboard.html`)
 
-For a interactive, self-contained visual breakdown of Doclarity's product architecture, AI pipeline steps, environment matrix, API endpoints, and local/production setup guides, open **`index.html`** in any web browser or host it via static web server:
+For a interactive, self-contained visual breakdown of Doclarity's product architecture, AI pipeline steps, environment matrix, API endpoints, and local/production setup guides, open **`dashboard.html`** in any web browser or host it via static web server:
 
 ```bash
 # Open directly in default web browser (macOS / Linux / Windows)
-open index.html        # macOS
-xdg-open index.html    # Linux
-start index.html       # Windows (PowerShell/CMD)
+open dashboard.html        # macOS
+xdg-open dashboard.html    # Linux
+start dashboard.html       # Windows (PowerShell/CMD)
 ```
 
-The hub operates with zero external dependencies and air-gapped fallback styling, rendering detailed JSON schemas, architecture flows, and copyable setup commands.
+The dashboard operates with zero external dependencies and air-gapped fallback styling, rendering detailed JSON schemas, architecture flows, and copyable setup commands.
 
 ---
 
@@ -34,7 +34,7 @@ The hub operates with zero external dependencies and air-gapped fallback styling
 
 ```text
 doclarity/
-├── index.html               # Project Information Hub & Interactive Architecture Hub
+├── dashboard.html           # Project Information Dashboard & Architecture Hub
 ├── DEPLOYMENT.md            # Production deployment instructions (Docker, VPS)
 ├── RAILWAY.md               # Railway Cloud hosting guide
 ├── docker-compose.yml       # Local development Docker setup
@@ -45,7 +45,7 @@ doclarity/
 │   └── vite.config.js
 └── server/                  # Express REST API & Analysis services
     ├── middleware/          # JWT authentication middleware
-    ├── routes/              # Express API endpoints (auth, upload, analyze, chat, compare, secure)
+    ├── routes/              # Express API endpoints (auth, upload, analyze, chat, compare)
     ├── services/            # Document parsing, spaCy NER, Gemini/Ollama LLM, RAG store
     └── package.json
 ```
@@ -106,7 +106,7 @@ npm run dev
 
 - **Frontend Application**: `http://localhost:5173`
 - **Backend API Health Check**: `http://localhost:5000/api/health`
-- **Project Information Hub**: Open `index.html` at the repository root.
+- **Project Information Dashboard**: Open `dashboard.html` at the repository root.
 
 ---
 
@@ -125,5 +125,4 @@ docker-compose -f docker-compose.prod.yml up -d --build
 ## Key Deployment & Operational Notes
 
 - **Production LLM Recommendation**: Railway and Cloud production deployments must configure `GEMINI_API_KEY` with `LLM_PROVIDER=gemini` for fast, scalable response times.
-- **Local Ollama Support**: Ollama (`USE_OLLAMA_FOR_ANALYZE=true`) is supported for offline local development and self-hosted GPU setups.
-- **Temporary Upload Storage**: Documents processed by Doclarity are stored temporarily in memory/ephemeral storage during analysis sessions.
+- **Offline Inspection**: The `dashboard.html` visual architecture dashboard requires zero npm modules or internet access and can be inspected in classified or air-gapped workstations.
